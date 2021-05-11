@@ -7,6 +7,10 @@ import com.metechvn.call.service.LinphoneService
 import org.linphone.core.*
 
 class SipCall {
+    
+    fun startSer(activity: Activity) {
+        activity.startService(Intent(activity,LinphoneService::class.java))
+    }
 
     fun login(username: String, password: String, domain: String) {
         val mAccountCreator = LinphoneService.getCore()?.createAccountCreator(null)
