@@ -1,25 +1,16 @@
 package com.metechvn.call.service
 
-import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.metechvn.call.R
-import com.metechvn.call.Utils
 import org.linphone.core.*
 import org.linphone.mediastream.Version
 import java.io.File
@@ -67,87 +58,69 @@ class LinphoneService : Service() {
         dumDeviceInformation()
         dumInstalledLinphoneInformation()
         mHandler = Handler(Looper.getMainLooper())
-//        val notificationManager =
-//            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//
-//        mCoreListener = object : CoreListenerStub() {
-//            @RequiresApi(Build.VERSION_CODES.O)
-//            @SuppressLint("WrongConstant")
-//            override fun onCallStateChanged(
-//                lc: Core?,
-//                call: Call?,
-//                cstate: Call.State?,
-//                message: String?
-//            ) {
-//                Log.e(TAG, "onCallStateChanged: $cstate - $message")
-//
-//                when (cstate) {
-//                    Call.State.IncomingReceived -> {
-//                        Utils.OUTCOMING = false
-//                        //accept
-//                        val intentAccept =
-//                            Intent(this@LinphoneService, IncomingReceiver::class.java)
-//                        intentAccept.action = "RECEIVE_CALL"
-//                        val pendingIntentAccept = PendingIntent.getBroadcast(
-//                            this@LinphoneService,
-//                            0,
-//                            intentAccept,
-//                            PendingIntent.FLAG_UPDATE_CURRENT
-//                        )
-//
-//                        val acceptAction = Notification.Action.Builder(
-//                            Icon.createWithResource(this@LinphoneService,R.drawable.ic_phone_accept),
-//                            "Accept",
-//                            pendingIntentAccept
-//                        ).build()
-//
-//                        //deny
-//                        val intentDeny = Intent(this@LinphoneService, IncomingReceiver::class.java)
-//                        intentDeny.action = "CANCEL_CALL"
-//
-//                        val pendingIntentDeny = PendingIntent.getBroadcast(
-//                            this@LinphoneService, 0, intentDeny, PendingIntent.FLAG_UPDATE_CURRENT
-//                        )
-//
-//                        val denyAction = Notification.Action.Builder(
-//                            Icon.createWithResource(this@LinphoneService, R.drawable.ic_phone_deny),
-//                            "Deny",
-//                            pendingIntentDeny
-//                        ).build()
-//
-//                        val notificationBuilder =
-//                            Notification.Builder(this@LinphoneService, CHANNEL_ID)
-//                                .setSmallIcon(R.drawable.ic_call)
-//                                .setContentTitle("New Call")
-//                                .setContentText("From ${getCore()?.currentCallRemoteAddress?.asStringUriOnly()}")
-//                                .setAutoCancel(true)
-//                                .addAction(acceptAction)
-//                                .addAction(denyAction)
-//                                .setCategory(NotificationCompat.CATEGORY_CALL)
-//                                .setColor(Color.BLUE)
-//                                .setDefaults(Notification.DEFAULT_ALL)
-//                                .setPriority(NotificationCompat.PRIORITY_MAX)
-//
-//                        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
-//
-//                    }
-//                    Call.State.Connected -> {
-//////                        if (!Utils.OUTCOMING) {
-//////                            val intent = Intent(this@LinphoneService, CallActivity::class.java)
-//////                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//////                            startActivity(intent)
-//////                        }
-//////                        notificationManager.cancel(0)
-//                        notificationManager.cancel(0)
-//                    }
-//                    Call.State.Released -> {
-//                        notificationManager.cancel(0)
-//                    }
-//                    else -> {
-//                        Log.e(TAG, "onCallStateChanged1: $cstate" )}
-//                }
-//            }
-//        }
+        mCoreListener = object : CoreListenerStub() {
+            override fun onCallStateChanged(lc: Core?, call: Call?, cstate: Call.State?, message: String?) {
+                super.onCallStateChanged(lc, call, cstate, message)
+                when (cstate) {
+                    Call.State.Idle -> { sendActionBroadcast("Call.State.Idle") }
+
+                    Call.State.IncomingReceived -> { sendActionBroadcast("Call.State.IncomingReceived") }
+
+                    Call.State.OutgoingInit -> { sendActionBroadcast("Call.State.OutgoingInit") }
+
+                    Call.State.OutgoingProgress -> { sendActionBroadcast("Call.State.OutgoingProgress") }
+
+                    Call.State.OutgoingRinging -> { sendActionBroadcast("Call.State.OutgoingRinging") }
+
+                    Call.State.OutgoingEarlyMedia -> { sendActionBroadcast("Call.State.OutgoingEarlyMedia") }
+
+                    Call.State.Connected -> { sendActionBroadcast("Call.State.Connected") }
+
+                    Call.State.StreamsRunning -> { sendActionBroadcast("Call.State.StreamsRunning") }
+
+                    Call.State.Pausing -> { sendActionBroadcast("Call.State.Pausing") }
+
+                    Call.State.Paused -> { sendActionBroadcast("Call.State.Paused") }
+
+                    Call.State.Resuming -> { sendActionBroadcast("Call.State.Resuming") }
+
+                    Call.State.Referred -> { sendActionBroadcast("Call.State.Referred") }
+
+                    Call.State.Error -> { sendActionBroadcast("Call.State.Error") }
+
+                    Call.State.End -> { sendActionBroadcast("Call.State.End") }
+
+                    Call.State.PausedByRemote -> { sendActionBroadcast("Call.State.PausedByRemote") }
+
+                    Call.State.UpdatedByRemote -> { sendActionBroadcast("Call.State.UpdatedByRemote") }
+
+                    Call.State.IncomingEarlyMedia -> { sendActionBroadcast("Call.State.IncomingEarlyMedia") }
+
+                    Call.State.Updating -> { sendActionBroadcast("Call.State.Updating") }
+
+                    Call.State.Released -> { sendActionBroadcast("Call.State.Released") }
+
+                    Call.State.EarlyUpdatedByRemote -> { sendActionBroadcast("Call.State.EarlyUpdatedByRemote") }
+
+                    Call.State.EarlyUpdating -> { sendActionBroadcast("Call.State.EarlyUpdating") }
+                    else -> {}
+                } }
+
+            override fun onRegistrationStateChanged(lc: Core?, cfg: ProxyConfig?, cstate: RegistrationState?, message: String?) {
+                super.onRegistrationStateChanged(lc, cfg, cstate, message)
+                when (cstate) {
+                    RegistrationState.None -> { sendActionBroadcast("RegistrationState.None") }
+
+                    RegistrationState.Progress -> { sendActionBroadcast("RegistrationState.Progress") }
+
+                    RegistrationState.Ok -> { sendActionBroadcast("RegistrationState.Ok") }
+
+                    RegistrationState.Cleared -> { sendActionBroadcast("RegistrationState.Cleared") }
+
+                    RegistrationState.Failed -> { sendActionBroadcast("RegistrationState.Failed") }
+                } }
+
+        }
 
         try {
             copyIfNotExist(R.raw.linphonerc_default, "$basePath/.linphonerc")
@@ -158,6 +131,12 @@ class LinphoneService : Service() {
         mCore = Factory.instance().createCore("$basePath/.linphonerc", "$basePath/linphonerc", this)
         mCore?.addListener(mCoreListener)
         configureCore()
+    }
+
+    private fun sendActionBroadcast(action: String){
+        val intent = Intent()
+        intent.action = action
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

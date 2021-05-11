@@ -2,14 +2,16 @@ package com.metechvn.call
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import com.metechvn.call.service.LinphoneService
-import org.linphone.core.*
+import org.linphone.core.Address
+import org.linphone.core.CallParams
+import org.linphone.core.ProxyConfig
+import org.linphone.core.TransportType
 
 class SipCall {
-    
-    fun startSer(activity: Activity) {
-        activity.startService(Intent(activity,LinphoneService::class.java))
+
+    fun startService(activity: Activity) {
+        activity.startService(Intent(activity, LinphoneService::class.java))
     }
 
     fun login(username: String, password: String, domain: String) {
@@ -23,11 +25,11 @@ class SipCall {
     }
 
     fun call(number: String) {
-            val addressToCall: Address? =  LinphoneService.getCore()?.interpretUrl(number)
-            val params: CallParams? =  LinphoneService.getCore()?.createCallParams(null)
-            params?.enableAudio(true)
-            if (addressToCall != null)
-                LinphoneService.getCore()?.inviteAddressWithParams(addressToCall, params)
+        val addressToCall: Address? = LinphoneService.getCore()?.interpretUrl(number)
+        val params: CallParams? = LinphoneService.getCore()?.createCallParams(null)
+        params?.enableAudio(true)
+        if (addressToCall != null)
+            LinphoneService.getCore()?.inviteAddressWithParams(addressToCall, params)
     }
 
 }

@@ -32,6 +32,16 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://linphone.org/maven_repository/"
+    }
+}
+
+configurations {
+    all*.exclude group: 'xpp3', module: 'xpp3'
+}
+
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -42,4 +52,6 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    implementation project(":call")
 }
