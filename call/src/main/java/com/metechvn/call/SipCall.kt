@@ -48,4 +48,16 @@ class SipCall {
             call?.decline(Reason.Declined)
         }
     }
+
+    fun endCall() {
+        val core = LinphoneService.getCore()
+        if (core != null) {
+            if (core.callsNb > 0) {
+                var call: Call? = core.currentCall
+                if (call == null) call =
+                    core.calls[0]
+                call?.terminate()
+            }
+        }
+    }
 }
