@@ -6,12 +6,14 @@ import com.metechvn.call.service.LinphoneService
 import org.linphone.core.*
 
 class SipCall {
+    private val TAG = "SipCall"
 
     fun startService(activity: Activity) {
         activity.startService(Intent(activity, LinphoneService::class.java))
     }
 
     fun login(username: String, password: String, domain: String) {
+
         val mAccountCreator = LinphoneService.getCore()?.createAccountCreator(null)
         mAccountCreator?.username = username
         mAccountCreator?.password = password
@@ -58,6 +60,17 @@ class SipCall {
                     core.calls[0]
                 call?.terminate()
             }
+        }
+    }
+
+    fun logout() {
+        try {
+            val cfg = LinphoneService.getCore()?.defaultProxyConfig
+            if (cfg != null) {
+                LinphoneService.getCore()?.removeProxyConfig(cfg)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
